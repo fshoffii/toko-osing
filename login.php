@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Masuk';
 require __DIR__ . '/includes/header.php';
 ?>
+
 <section class="auth-wrap">
   <div class="auth-card">
     <h1>Masuk ke Toko Osing</h1>
