@@ -33,7 +33,10 @@ if ($__user) {
 <body>
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="<?= e($__user ? home_for($__user['role']) : url('login.php')) ?>">Toko Osing</a>
+    <div class="brand-wrap">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <a class="brand" href="<?= e($__user ? home_for($__user['role']) : url('login.php')) ?>">Toko Osing</a>
+    </div>
 
     <?php if ($__nav): ?>
       <nav class="mainnav" aria-label="Navigasi utama">
@@ -44,9 +47,18 @@ if ($__user) {
     <?php endif; ?>
 
     <?php if ($__user): ?>
+      <form class="header-search" method="get" action="<?= e(url('buyer/catalog.php')) ?>">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input type="search" name="q" value="<?= e((string) ($_GET['q'] ?? '')) ?>" placeholder="Cari produk, usaha, atau desa...">
+      </form>
+
       <div class="account">
-        <span class="role role-<?= e($__user['role']) ?>"><?= e(role_label($__user['role'])) ?></span>
-        <span class="account-name"><?= e($__user['nama']) ?></span>
+        <button type="button" class="icon-button" aria-label="Notifikasi">◌</button>
+        <button type="button" class="icon-button" aria-label="Pengaturan">⚙</button>
+        <div class="user-pill">
+          <span class="user-avatar" aria-hidden="true"><?= strtoupper(substr((string) $__user['nama'], 0, 1)) ?></span>
+          <span class="account-name"><?= e($__user['nama']) ?></span>
+        </div>
         <form method="post" action="<?= e(url('logout.php')) ?>">
           <?= csrf_field() ?>
           <button type="submit" class="btn btn-ghost btn-sm">Keluar</button>
