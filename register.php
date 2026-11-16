@@ -8,7 +8,7 @@ if ($user) {
     redirect(home_for($user['role']));
 }
 
-$form = ['nama' => '', 'email' => '', 'whatsapp' => ''];
+$form = ['nama' => '', 'email' => '', 'whatsapp' => '', 'password' => '', 'password_confirm' => ''];
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
