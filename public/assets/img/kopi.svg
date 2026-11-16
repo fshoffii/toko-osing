@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Kopi">
+  <rect width="400" height="300" fill="#4a2f1b"/>
+  <g fill="#d9a441" opacity=".85">
+    <ellipse cx="150" cy="150" rx="46" ry="62" transform="rotate(-25 150 150)"/>
+    <ellipse cx="250" cy="170" rx="40" ry="54" transform="rotate(20 250 170)"/>
+    <path d="M150 90c-6 40-6 80 0 120" stroke="#4a2f1b" stroke-width="5" fill="none"/>
+    <path d="M250 120c-5 34-5 66 0 100" stroke="#4a2f1b" stroke-width="5" fill="none"/>
+  </g>
+  <text x="200" y="285" font-family="sans-serif" font-size="24" text-anchor="middle" fill="#d9a441">Kopi</text>
+</svg>

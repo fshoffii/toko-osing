@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= pageTitle %> — Toko Osing</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="<%= currentUser ? homeFor(currentUser.role) : '/login' %>">Toko Osing</a>
+
+    <% if (currentUser) { %>
+      <nav class="mainnav" aria-label="Navigasi utama">
+        <% if (currentUser.role === 'admin') { %>
+          <a href="/admin/users"<%= currentPath.startsWith('/admin/users') ? ' aria-current="page"' : '' %>>Kelola Pengguna</a>
+        <% } else if (currentUser.role === 'seller') { %>
+          <a href="/seller/products"<%= currentPath.startsWith('/seller/products') ? ' aria-current="page"' : '' %>>Produk &amp; Harga</a>
+          <a href="/seller/categories"<%= currentPath.startsWith('/seller/categories') ? ' aria-current="page"' : '' %>>Kategori</a>
+        <% } else { %>
+          <a href="/buyer/catalog"<%= currentPath.startsWith('/buyer/catalog') ? ' aria-current="page"' : '' %>>Katalog</a>
+        <% } %>
+      </nav>
+
+      <div class="account">
+        <span class="role role-<%= currentUser.role %>"><%= roleLabel(currentUser.role) %></span>
+        <span class="account-name"><%= currentUser.nama %></span>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-ghost btn-sm">Keluar</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="account">
+        <a class="btn btn-ghost btn-sm" href="/login">Masuk</a>
+        <a class="btn btn-sm" href="/register">Daftar Pembeli</a>
+      </div>
+    <% } %>
+  </div>
+</header>
+
+<main class="container">
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <div class="flash flash-<%= flash.type %>" role="status"><%= flash.message %></div>
+  <% } %>

@@ -1,0 +1,152 @@
+<%- include('../partials/header') %>
+<div class="page-head">
+  <div>
+    <h1>Kelola Pengguna</h1>
+    <p class="lead">Admin dapat menambah, mengubah peran, menonaktifkan, dan menghapus akun.</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><strong><%= Number(stats.total) %></strong><span>Total pengguna</span></div>
+  <div class="stat"><strong><%= Number(stats.admin_count) %></strong><span>Admin</span></div>
+  <div class="stat"><strong><%= Number(stats.seller_count) %></strong><span>Seller</span></div>
+  <div class="stat"><strong><%= Number(stats.buyer_count) %></strong><span>Pembeli</span></div>
+  <div class="stat"><strong><%= Number(stats.inactive_count) %></strong><span>Nonaktif</span></div>
+</div>
+
+<% if (errors.general) { %>
+  <div class="flash flash-error"><%= errors.general %></div>
+<% } %>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2><%= editing ? 'Ubah pengguna' : 'Tambah pengguna' %></h2>
+    <% if (editing) { %>
+      <a class="btn btn-ghost btn-sm" href="/admin/users">Batal edit</a>
+    <% } %>
+  </div>
+
+  <form method="post" action="/admin/users" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="action" value="<%= editing ? 'update' : 'create' %>">
+    <% if (editing) { %>
+      <input type="hidden" name="id" value="<%= Number(editing.id) %>">
+    <% } %>
+
+    <div class="field">
+      <label for="nama">Nama</label>
+      <input type="text" id="nama" name="nama" value="<%= form.nama %>" maxlength="100" required>
+      <% if (errors.nama) { %><span class="error"><%= errors.nama %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="<%= form.email %>" maxlength="150" required>
+      <% if (errors.email) { %><span class="error"><%= errors.email %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="whatsapp">WhatsApp pengguna (opsional)</label>
+      <input type="text" id="whatsapp" name="whatsapp" value="<%= form.whatsapp %>" inputmode="numeric" placeholder="08xxxxxxxxxx">
+      <% if (errors.whatsapp) { %><span class="error"><%= errors.whatsapp %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="role">Peran</label>
+      <select id="role" name="role">
+        <% Object.entries(roleOptions).forEach(([value, label]) => { %>
+          <option value="<%= value %>"<%= form.role === value ? ' selected' : '' %>><%= label %></option>
+        <% }) %>
+      </select>
+      <% if (errors.role) { %><span class="error"><%= errors.role %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="password"><%= editing ? 'Kata sandi baru (opsional)' : 'Kata sandi' %></label>
+      <input type="password" id="password" name="password" autocomplete="new-password"<%= editing ? '' : ' required' %>>
+      <% if (errors.password) { %><span class="error"><%= errors.password %></span><% } %>
+    </div>
+    <div class="field">
+      <label class="check"><input type="checkbox" name="is_active" value="1"<%= Number(form.is_active) ? ' checked' : '' %>> Akun aktif</label>
+    </div>
+
+    <fieldset class="fieldset full">
+      <legend>Profil seller <span class="muted">(wajib diisi jika peran Seller)</span></legend>
+      <div class="form">
+        <div class="field">
+          <label for="nama_usaha">Nama usaha</label>
+          <input type="text" id="nama_usaha" name="nama_usaha" value="<%= form.nama_usaha %>" maxlength="120">
+          <% if (errors.nama_usaha) { %><span class="error"><%= errors.nama_usaha %></span><% } %>
+        </div>
+        <div class="field">
+          <label for="desa">Desa</label>
+          <select id="desa" name="desa">
+            <% desaOptions.forEach((desa) => { %>
+              <option value="<%= desa %>"<%= form.desa === desa ? ' selected' : '' %>><%= desa %></option>
+            <% }) %>
+          </select>
+          <% if (errors.desa) { %><span class="error"><%= errors.desa %></span><% } %>
+        </div>
+        <div class="field">
+          <label for="seller_whatsapp">WhatsApp seller</label>
+          <input type="text" id="seller_whatsapp" name="seller_whatsapp" value="<%= form.seller_whatsapp %>" inputmode="numeric" placeholder="628xxxxxxxxxx">
+          <% if (errors.seller_whatsapp) { %><span class="error"><%= errors.seller_whatsapp %></span><% } %>
+        </div>
+        <div class="field">
+          <label for="profil">Profil singkat</label>
+          <input type="text" id="profil" name="profil" value="<%= form.profil %>" maxlength="255">
+          <% if (errors.profil) { %><span class="error"><%= errors.profil %></span><% } %>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="field full">
+      <button type="submit" class="btn"><%= editing ? 'Simpan perubahan' : 'Tambah pengguna' %></button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Daftar pengguna</h2>
+    <span class="muted"><%= users.length %> akun</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Nama</th><th>Email</th><th>Peran</th><th>Seller</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+        <% users.forEach((row) => { %>
+          <tr>
+            <td><%= row.nama %></td>
+            <td><%= row.email %></td>
+            <td><span class="role role-<%= row.role %>"><%= roleLabel(row.role) %></span></td>
+            <td>
+              <% if (row.nama_usaha) { %>
+                <%= row.nama_usaha %><br><span class="muted">Desa <%= row.desa %></span>
+              <% } else { %>
+                <span class="muted">—</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (Number(row.is_active)) { %>
+                <span class="badge badge-ok">Aktif</span>
+              <% } else { %>
+                <span class="badge badge-off">Nonaktif</span>
+              <% } %>
+            </td>
+            <td class="actions">
+              <a class="btn btn-ghost btn-sm" href="/admin/users?edit=<%= Number(row.id) %>">Ubah</a>
+              <% if (Number(row.id) !== Number(currentUser.id)) { %>
+                <form method="post" action="/admin/users" onsubmit="return confirm('Hapus pengguna ini? Produk milik seller juga akan dihapus.');">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="id" value="<%= Number(row.id) %>">
+                  <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,135 @@
+<%- include('../partials/header') %>
+<div class="page-head">
+  <div>
+    <h1>Produk &amp; Harga</h1>
+    <p class="lead"><%= currentUser.nama_usaha %> — Desa <%= currentUser.desa %>. Anda hanya dapat mengelola produk milik usaha ini.</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><strong><%= Number(stats.total) %></strong><span>Total produk</span></div>
+  <div class="stat"><strong><%= Number(stats.total_stok) %></strong><span>Total stok</span></div>
+  <div class="stat"><strong><%= Number(stats.stok_rendah) %></strong><span>Stok rendah</span></div>
+  <div class="stat"><strong><%= Number(stats.habis) %></strong><span>Habis</span></div>
+  <div class="stat"><strong><%= Number(stats.unggulan) %></strong><span>Unggulan</span></div>
+</div>
+
+<% if (errors.general) { %>
+  <div class="flash flash-error"><%= errors.general %></div>
+<% } %>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2><%= editing ? 'Ubah produk' : 'Tambah produk' %></h2>
+    <% if (editing) { %>
+      <a class="btn btn-ghost btn-sm" href="/seller/products">Batal edit</a>
+    <% } %>
+  </div>
+
+  <% if (!categories.length) { %>
+    <p class="muted">Belum ada kategori. <a href="/seller/categories">Buat kategori dulu</a>.</p>
+  <% } %>
+
+  <form method="post" action="/seller/products" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="action" value="<%= editing ? 'update' : 'create' %>">
+    <% if (editing) { %>
+      <input type="hidden" name="id" value="<%= Number(editing.id) %>">
+    <% } %>
+
+    <div class="field full">
+      <label for="nama">Nama produk</label>
+      <input type="text" id="nama" name="nama" value="<%= form.nama %>" maxlength="120" required>
+      <% if (errors.nama) { %><span class="error"><%= errors.nama %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="category_id">Kategori</label>
+      <select id="category_id" name="category_id" required>
+        <option value="">Pilih kategori</option>
+        <% categories.forEach((category) => { %>
+          <option value="<%= Number(category.id) %>"<%= String(category.id) === String(form.category_id) ? ' selected' : '' %>><%= category.nama %></option>
+        <% }) %>
+      </select>
+      <% if (errors.category_id) { %><span class="error"><%= errors.category_id %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="harga">Harga (Rp)</label>
+      <input type="number" id="harga" name="harga" value="<%= form.harga %>" min="0" step="1" required>
+      <% if (errors.harga) { %><span class="error"><%= errors.harga %></span><% } %>
+    </div>
+    <div class="field">
+      <label for="stok">Stok</label>
+      <input type="number" id="stok" name="stok" value="<%= form.stok %>" min="0" step="1" required>
+      <% if (errors.stok) { %><span class="error"><%= errors.stok %></span><% } %>
+    </div>
+    <div class="field full">
+      <label for="deskripsi">Deskripsi (maks. 200 karakter)</label>
+      <textarea id="deskripsi" name="deskripsi" rows="3" maxlength="200"><%= form.deskripsi %></textarea>
+      <% if (errors.deskripsi) { %><span class="error"><%= errors.deskripsi %></span><% } %>
+    </div>
+    <div class="field full checks">
+      <label class="check"><input type="checkbox" name="unggulan" value="1"<%= Number(form.unggulan) ? ' checked' : '' %>> Produk unggulan</label>
+      <label class="check"><input type="checkbox" name="oleh_oleh" value="1"<%= Number(form.oleh_oleh) ? ' checked' : '' %>> Oleh-oleh khas Banyuwangi</label>
+    </div>
+    <div class="field full">
+      <button type="submit" class="btn"<%= categories.length ? '' : ' disabled' %>><%= editing ? 'Simpan perubahan' : 'Tambah produk' %></button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Daftar produk</h2>
+    <form method="get" action="/seller/products" class="inline-search">
+      <label for="q" class="sr-only">Cari produk</label>
+      <input type="search" id="q" name="q" value="<%= search %>" placeholder="Cari produk...">
+      <button type="submit" class="btn btn-sm">Cari</button>
+    </form>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Label</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+        <% if (!products.length) { %>
+          <tr><td colspan="6" class="muted center">Belum ada produk yang cocok.</td></tr>
+        <% } %>
+        <% products.forEach((product) => { %>
+          <tr>
+            <td>
+              <strong><%= product.nama %></strong>
+              <% if (product.deskripsi) { %><br><span class="muted"><%= product.deskripsi %></span><% } %>
+            </td>
+            <td><%= product.kategori %></td>
+            <td><%= rupiah(product.harga) %></td>
+            <td>
+              <% if (Number(product.stok) === 0) { %>
+                <span class="badge badge-off">Habis</span>
+              <% } else if (Number(product.stok) <= 5) { %>
+                <span class="badge badge-warn">Sisa <%= Number(product.stok) %></span>
+              <% } else { %>
+                <%= Number(product.stok) %>
+              <% } %>
+            </td>
+            <td>
+              <% if (Number(product.unggulan)) { %><span class="badge badge-accent">Unggulan</span><% } %>
+              <% if (Number(product.oleh_oleh)) { %><span class="badge">Oleh-oleh</span><% } %>
+            </td>
+            <td class="actions">
+              <a class="btn btn-ghost btn-sm" href="/seller/products?edit=<%= Number(product.id) %>">Ubah</a>
+              <form method="post" action="/seller/products" onsubmit="return confirm('Hapus produk ini?');">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value="<%= Number(product.id) %>">
+                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

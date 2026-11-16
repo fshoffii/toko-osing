@@ -1,0 +1,64 @@
+CREATE DATABASE IF NOT EXISTS toko_osing_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE toko_osing_db;
+
+CREATE TABLE IF NOT EXISTS sellers (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nama_usaha VARCHAR(120) NOT NULL,
+  desa ENUM('Kemiren', 'Tamansari', 'Osing') NOT NULL,
+  profil VARCHAR(255) NOT NULL DEFAULT '',
+  whatsapp VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nama VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'seller', 'buyer') NOT NULL DEFAULT 'buyer',
+  whatsapp VARCHAR(20) DEFAULT NULL,
+  seller_id INT UNSIGNED DEFAULT NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_users_email (email),
+  KEY idx_users_seller (seller_id),
+  CONSTRAINT fk_users_seller FOREIGN KEY (seller_id) REFERENCES sellers (id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS categories (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nama VARCHAR(60) NOT NULL,
+  slug VARCHAR(80) NOT NULL,
+  deskripsi VARCHAR(200) NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_categories_nama (nama),
+  UNIQUE KEY uq_categories_slug (slug)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS products (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  seller_id INT UNSIGNED NOT NULL,
+  category_id INT UNSIGNED NOT NULL,
+  nama VARCHAR(120) NOT NULL,
+  harga INT UNSIGNED NOT NULL DEFAULT 0,
+  stok INT UNSIGNED NOT NULL DEFAULT 0,
+  deskripsi VARCHAR(200) NOT NULL DEFAULT '',
+  image_url VARCHAR(255) NOT NULL DEFAULT '',
+  unggulan TINYINT(1) NOT NULL DEFAULT 0,
+  oleh_oleh TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_products_seller (seller_id),
+  KEY idx_products_category (category_id),
+  CONSTRAINT fk_products_seller FOREIGN KEY (seller_id) REFERENCES sellers (id) ON DELETE CASCADE,
+  CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+

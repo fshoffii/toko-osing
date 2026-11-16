@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Gula Aren">
+  <rect width="400" height="300" fill="#a8651f"/>
+  <g fill="#f3d9a8" stroke="#6b3f10" stroke-width="3">
+    <rect x="90" y="100" width="90" height="90" rx="12"/>
+    <rect x="210" y="120" width="80" height="80" rx="12"/>
+    <circle cx="300" cy="90" r="26"/>
+    <circle cx="110" cy="220" r="24"/>
+    <circle cx="255" cy="235" r="18"/>
+  </g>
+  <text x="200" y="285" font-family="sans-serif" font-size="24" text-anchor="middle" fill="#f3d9a8">Gula Aren</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Toko Osing">
+  <rect width="400" height="300" fill="#f4c430"/>
+  <g fill="none" stroke="#14151a" stroke-width="4" opacity=".35">
+    <circle cx="110" cy="110" r="44"/>
+    <circle cx="200" cy="140" r="44"/>
+    <circle cx="290" cy="110" r="44"/>
+    <circle cx="160" cy="205" r="44"/>
+    <circle cx="245" cy="205" r="44"/>
+  </g>
+  <text x="200" y="270" font-family="sans-serif" font-size="26" text-anchor="middle" fill="#14151a">Toko Osing</text>
+</svg>

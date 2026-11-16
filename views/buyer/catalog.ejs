@@ -1,0 +1,109 @@
+<%- include('../partials/header') %>
+<div class="page-head">
+  <div>
+    <h1>Katalog Produk Desa</h1>
+    <p class="lead">Halo <%= currentUser.nama %>. Jelajahi produk perajin, lalu hubungi seller lewat WhatsApp.</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><strong><%= Number(totals.total_products) %></strong><span>Produk tersedia</span></div>
+  <div class="stat"><strong><%= Number(totals.total_sellers) %></strong><span>Usaha perajin</span></div>
+  <div class="stat"><strong><%= desaOptions.length %></strong><span>Desa wisata</span></div>
+  <div class="stat"><strong><%= categoryOptions.length %></strong><span>Kategori</span></div>
+</div>
+
+<div class="flash flash-info">
+  Sebagai pembeli, Anda hanya dapat melihat katalog dan menghubungi seller melalui WhatsApp. Tidak ada transaksi di dalam aplikasi.
+</div>
+
+<form method="get" action="/buyer/catalog" class="filters">
+  <div class="field filter-search">
+    <label for="q">Cari</label>
+    <input type="search" id="q" name="q" value="<%= filters.q %>" placeholder="Produk, usaha, atau desa">
+  </div>
+  <div class="field">
+    <label for="desa">Desa</label>
+    <select id="desa" name="desa">
+      <option value="">Semua desa</option>
+      <% desaOptions.forEach((option) => { %>
+        <option value="<%= option %>"<%= filters.desa === option ? ' selected' : '' %>><%= option %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label for="kategori">Kategori</label>
+    <select id="kategori" name="kategori">
+      <option value="">Semua kategori</option>
+      <% categoryOptions.forEach((option) => { %>
+        <option value="<%= option %>"<%= filters.kategori === option ? ' selected' : '' %>><%= option %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label for="sort">Urutkan</label>
+    <select id="sort" name="sort">
+      <option value="unggulan"<%= filters.sort === 'unggulan' ? ' selected' : '' %>>Unggulan dulu</option>
+      <option value="murah"<%= filters.sort === 'murah' ? ' selected' : '' %>>Harga termurah</option>
+      <option value="mahal"<%= filters.sort === 'mahal' ? ' selected' : '' %>>Harga termahal</option>
+      <option value="nama"<%= filters.sort === 'nama' ? ' selected' : '' %>>Nama A–Z</option>
+      <option value="stok"<%= filters.sort === 'stok' ? ' selected' : '' %>>Stok terbanyak</option>
+    </select>
+  </div>
+  <div class="filter-actions">
+    <button type="submit" class="btn">Terapkan</button>
+    <% if (activeFilters) { %>
+      <a class="btn btn-ghost" href="/buyer/catalog">Reset filter</a>
+    <% } %>
+  </div>
+</form>
+
+<p class="result-count">Menampilkan <%= products.length %> dari <%= Number(totals.total_products) %> produk</p>
+
+<% if (!products.length) { %>
+  <div class="empty">
+    <h2>Tidak ada produk yang cocok</h2>
+    <p>Coba kata kunci lain atau reset filter.</p>
+    <a class="btn" href="/buyer/catalog">Reset filter</a>
+  </div>
+<% } else { %>
+  <div class="product-grid">
+    <% products.forEach((product) => { %>
+      <%
+        const stock = Number(product.stok);
+        const message = 'Halo Toko Osing, saya ingin memesan ' + product.nama +
+          ' dari ' + product.nama_usaha +
+          ' (Desa ' + product.desa + '), harga ' + rupiah(product.harga) +
+          '. Jumlah: 1. Mohon info ketersediaan dan cara pembayaran.';
+      %>
+      <article class="product-card">
+        <img src="<%= productImage(product) %>" alt="<%= product.nama %>" loading="lazy">
+        <div class="product-body">
+          <div class="badges">
+            <% if (Number(product.unggulan)) { %><span class="badge badge-accent">Unggulan</span><% } %>
+            <% if (Number(product.oleh_oleh)) { %><span class="badge">Oleh-oleh khas Banyuwangi</span><% } %>
+          </div>
+          <h2><%= product.nama %></h2>
+          <p class="muted"><%= product.kategori %> · <%= product.nama_usaha %>, Desa <%= product.desa %></p>
+          <% if (product.deskripsi) { %>
+            <p class="product-desc"><%= product.deskripsi %></p>
+          <% } %>
+          <div class="product-foot">
+            <strong class="price"><%= rupiah(product.harga) %></strong>
+            <span class="stock<%= stock > 0 && stock <= 5 ? ' low' : '' %>">
+              <%= stock === 0 ? 'Habis' : stock <= 5 ? 'Sisa ' + stock : 'Stok ' + stock %>
+            </span>
+          </div>
+          <% if (stock === 0) { %>
+            <button type="button" class="btn btn-block" disabled>Habis</button>
+          <% } else { %>
+            <a class="btn btn-wa btn-block"
+               href="<%= waUrl(product.seller_whatsapp, message) %>"
+               target="_blank" rel="noopener noreferrer">Hubungi Seller via WhatsApp</a>
+          <% } %>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+<% } %>
+<%- include('../partials/footer') %>

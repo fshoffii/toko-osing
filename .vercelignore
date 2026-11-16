@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+assets/
+admin/
+buyer/
+config/
+includes/
+seller/
+database/
+*.php
+toko-osing.html
+SPEC.md
+scripts/
+
